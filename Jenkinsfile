@@ -1,5 +1,10 @@
 pipeline{
     agent any
+
+    environment{
+        VERSION = "${env.BUILD_ID}"
+    }
+
     stages {
         stage("sonarqube static code check"){
             agent{
@@ -41,7 +46,22 @@ pipeline{
 	
         }
 
-        
+        stage("docker build & docker push"){
+            steps{
+                script{
+                    withCredentials([string(credentialsId: 'docker_pass', variable: 'docker_password')]) {
+                             sh '''
+                                docker build -t nexus:8083/springapp:${VERSION} .
+                                docker login -u admin -p $docker_password nexus:8083
+                                docker push  nexus:8083/springapp:${VERSION}
+                                docker rmi nexus:8083/springapp:${VERSION}
+                            '''
+                    }
+                }
+            }
+        }
+
+
     }
 
     post{
