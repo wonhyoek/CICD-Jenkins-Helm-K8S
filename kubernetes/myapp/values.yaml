@@ -1,0 +1,11 @@
+replicaCount: 2
+
+image:
+  repository: springapp
+  pullPolicy: IfNotPresent
+  tag: ImageTAG
+
+service:
+  type: NodePort
+  port: 8080
+
